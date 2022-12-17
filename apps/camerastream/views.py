@@ -53,6 +53,7 @@ def webcam_feed(request, id):
 					content_type='multipart/x-mixed-replace; boundary=frame')
 
 def test(name, number):
+    print(name)
     print(Person.objects.filter(name=name).exists())
     print(Car.objects.filter(number=number))
     if Person.objects.filter(name=name).exists() and Car.objects.filter(number=number).exists():
@@ -88,6 +89,7 @@ def test(name, number):
 
 @login_required
 def recognition(request):
+    print(len(EntryPersonLog.objects.all()))
     if len(EntryPersonLog.objects.all())==0:
         car = EntryCarLog.objects.latest('date')
         person='unknown'
@@ -96,7 +98,7 @@ def recognition(request):
         person = EntryPersonLog.objects.latest('date')
         car='unknown'
         return StreamingHttpResponse(test(person.name, car))
-    elif (len(EntryCarLog.objects.all())==0) and (len(EntryPersonLog.objects.all())==0):
+    elif (len(EntryCarLog.objects.all())!=0) and (len(EntryPersonLog.objects.all())!=0):
         person = EntryPersonLog.objects.latest('date')
         car = EntryCarLog.objects.latest('date')
         return StreamingHttpResponse(test(person.name, car.number))
