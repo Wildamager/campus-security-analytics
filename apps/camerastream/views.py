@@ -85,11 +85,26 @@ def test(name, number):
     result = json.dumps(result)
     yield (result)
 
+
 @login_required
 def recognition(request):
-    person = EntryPersonLog.objects.latest('date')
-    car = EntryCarLog.objects.latest('date')
-    return StreamingHttpResponse(test(person.name, car.number))
+    if len(EntryPersonLog.objects.all())==0:
+        car = EntryCarLog.objects.latest('date')
+        person='unknown'
+        return StreamingHttpResponse(test(person, car.number))
+    elif len(EntryCarLog.objects.all())==0:
+        person = EntryPersonLog.objects.latest('date')
+        car='unknown'
+        return StreamingHttpResponse(test(person.name, car))
+    elif (len(EntryCarLog.objects.all())==0) and (len(EntryPersonLog.objects.all())==0):
+        person = EntryPersonLog.objects.latest('date')
+        car = EntryCarLog.objects.latest('date')
+        return StreamingHttpResponse(test(person.name, car.number))
+    else:
+        person='unknown'
+        car='unknown'
+        return StreamingHttpResponse(test(person, car))
+
 
 @login_required
 def livecam_feed(request, id):
