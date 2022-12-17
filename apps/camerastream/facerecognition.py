@@ -1,7 +1,7 @@
 import cv2
 import pickle
 from PIL import Image, ImageDraw
-import face_recognition_models
+
 import face_recognition
 import numpy as np
 import dlib
@@ -57,18 +57,17 @@ def show_prediction_labels_on_image(frame, predictions):
     return opencvimage
 
 
-def main(camera, persones):
-    print(camera, persones)
+def start():
     startTime = time.time()
     lastTime = time.time()
     print(f'\rSetting GEN HOLL cameras up..\tTime: {time.ctime()}', end="")
     process_this_frame = 30
-    if camera.login != '' or camera.password != '':
-        url = cv2.VideoCapture(f'rtsp://{camera.ip}:{camera.port}//user={camera.login}_password={camera.password}_channel=1_stream=0.sdp?real_stream')
-    else:
-        url = cv2.VideoCapture(f'rtsp://{camera.ip}:{camera.port}/h264_ulaw.sdp')
-    print(url)
-    url = 'rtsp://192.168.1.54:554//user=admin_password=662_channel=1_stream=0.sdp?real_stream' # Camera URL rtsp://192.168.1.87:8080/h264_ulaw.sdp
+    # if camera.login != '' or camera.password != '':
+    #     url = cv2.VideoCapture(f'rtsp://{camera.ip}:{camera.port}//user={camera.login}_password={camera.password}_channel=1_stream=0.sdp?real_stream')
+    # else:
+    #     url = cv2.VideoCapture(f'rtsp://{camera.ip}:{camera.port}/h264_ulaw.sdp')
+    # print(url)
+    url = 'rtsp://192.168.1.87:8080/h264_ulaw.sdp' # Camera URL rtsp://192.168.1.87:8080/h264_ulaw.sdp
     cap = cv2.VideoCapture(url)
     while 1 > 0:
         
@@ -82,7 +81,7 @@ def main(camera, persones):
                 img = cv2.resize(frame, (0, 0), fx=0.55, fy=0.55)
                 
                 counts_of_predict = 0
-                predictions = predict(img, model_path="apps/utils/trained_model.clf") #Model trained on photo
+                predictions = predict(img, model_path="apps/camerastream/trained_model.clf") #Model trained on photo
                 if predictions != []:
                     for name, (top, right, bottom, left) in predictions:
                         if name != "unknown":

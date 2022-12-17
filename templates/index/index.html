@@ -14,6 +14,7 @@
     <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'index/css/index.css' %}" >
     <style>
         .select,
@@ -101,6 +102,19 @@
         document.getElementById('recognition').onclick = function() {
           document.getElementById('section-stream').hidden = true;
           document.getElementById('section-recognition').hidden = false;
+        }
+    </script>
+    <script>
+        function registerButton() {
+            axios.get("http://127.0.0.1:8000/dashboard/train/", {
+
+            })
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
         }
     </script>
 </body>

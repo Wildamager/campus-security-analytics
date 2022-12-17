@@ -25,15 +25,44 @@
                 <img src="{% url 'stream' camera %}">    
             </div>
             <div class="detectionsdata">
-                      <div class="datainfo">
-                        <p>Place for  owner</p>
-                      </div>
-                      <div id="number" class="datainfo">
-                        <p>changing place</p>
-                      </div>  
-                      <div class="datainfo">
-                        <p>Place for brand</p>
-                      </div>  
+              <div class="title">
+                <p>person name:</p>
+              </div>
+              <div id="name" class="datainfo">
+                <p>name</p>
+              </div>
+              <div class="title">
+                <p>person name:</p>
+              </div>
+              <div id="email" class="datainfo">
+                <p>email</p>
+              </div> 
+              <div class="title">
+                <p>person name:</p>
+              </div> 
+              <div id="contact" class="datainfo">
+                <p>contact</p>
+              </div>  
+            </div>
+            <div class="detectionsdata">
+              <div class="title">
+                <p>car owner:</p>
+              </div>
+              <div id="owner" class="datainfo">
+                <p>owner</p>
+              </div>
+              <div class="title">
+                <p>car number:</p>
+              </div>
+              <div id="number" class="datainfo">
+                <p>number</p>
+              </div>  
+              <div class="title">
+                <p>car brand:</p>
+              </div>
+              <div id="brand" class="datainfo">
+                <p>brand</p>
+              </div>  
             </div>
         </div>
 
@@ -45,7 +74,7 @@
   </body>
   <script type="text/javascript" src="{% static 'index/js/API.js' %}"></script>
   <script>
-    setInterval(doTask, 10000);
+      setInterval(doTask, 10000);
   </script>
 </html>
 {% endblock %}

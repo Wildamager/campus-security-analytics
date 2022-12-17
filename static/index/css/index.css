@@ -459,10 +459,31 @@ form{
   height: 100%;
 }
 
-.detectionsdata{
+.title{
+  float: left;
+  position: relative;
   width: 50%;
-  height: 180px;
+  height: 20%;
+  margin-top: 15px;
+  text-align: center;
+
   margin-top: 20px;
+  text-align: center;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 15px;
+  letter-spacing: 0.5em;
+
+  color: #3a4f6d
+}
+
+.detectionsdata{
+  width: 45%;
+  height: 180px;
+  margin-top: 40px;
+  margin-left: 10px;
   float:left;
   border: 0.5px solid #C2C2C2;
   box-shadow: 0px 2px 4px rgba(143, 143, 143, 0.1);
@@ -497,8 +518,9 @@ form{
   padding: 5px;
 }
 .datainfo{
+  float: left;
   position: relative;
-  width: 100%;
+  width: 50%;
   height: 20%;
   margin-top: 15px;
   text-align: center;

@@ -26,6 +26,8 @@ INSTALLED_APPS = [
     'admin_honeypot',
     'axes',
     'jazzmin',
+    "django_celery_beat",
+    "django_celery_results",
 ]
 
 MIDDLEWARE = [
@@ -63,6 +65,14 @@ TEMPLATES = [
         },
     },
 ]
+
+CELERY_BROKER_URL = config("CELERY_BROKER_REDIS_URL", default="redis://localhost:6379")
+
+CELERY_RESULT_BACKEND = config(
+    "CELERY_RESULT_BACKEND", default="redis://localhost:6379"
+)
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 

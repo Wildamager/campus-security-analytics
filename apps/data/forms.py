@@ -14,9 +14,8 @@ class PersonForm(forms.ModelForm):
 class CarForm(forms.ModelForm):  
     class Meta:  
         model = Car  
-        fields = ['owner', 'number', 'brand', 'image'] #https://docs.djangoproject.com/en/3.0/ref/forms/widgets/
+        fields = ['owner', 'number', 'brand'] #https://docs.djangoproject.com/en/3.0/ref/forms/widgets/
         widgets = { 'owner': forms.TextInput(attrs={ 'class': 'form-control' }), 
             'number': forms.TextInput(attrs={ 'class': 'form-control' }),
             'brand': forms.TextInput(attrs={ 'class': 'form-control' }),
-            'image': forms.FileInput(),
         }
