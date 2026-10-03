@@ -1,4 +1,6 @@
-# Camera Analytics Platform
+# campus-security-analytics
+
+**Camera analytics platform: video surveillance with face and licence-plate recognition.**
 
 Django web application for video surveillance analytics: it pulls a live stream
 from IP cameras, detects faces and licence plates in the frames, matches them
@@ -7,10 +9,6 @@ internal dashboard. Detection runs in background workers (Celery + Redis), so
 the HTTP request that starts a camera never blocks on computer vision.
 
 Built for the All-Russian Hackathon (2022) and reworked afterwards.
-
-<!-- Screenshots: put them in docs/screenshots/ and uncomment
-![Dashboard](docs/screenshots/dashboard.png)
--->
 
 ## Features
 
@@ -118,7 +116,10 @@ Open http://127.0.0.1:8000/ and sign in.
 | `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_HOST` / `POSTGRES_PORT` | — | PostgreSQL connection; empty `POSTGRES_DB` → SQLite |
 | `AXES_FAILURE_LIMIT` | `4` | login attempts before lockout |
 | `AXES_COOLOFF_TIME` | `2` | lockout duration, hours |
-| `CORS_ORIGIN_WHITELIST` | — | origins allowed by CORS, only needed for a separate frontend |
+
+The API and the dashboard share one origin, so no CORS configuration is needed.
+Serving the API from a separate frontend would mean adding `django-cors-headers`
+and a real origin list.
 
 ## REST API
 
