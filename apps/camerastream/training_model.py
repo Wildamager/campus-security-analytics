@@ -1,15 +1,21 @@
 ﻿from sklearn import neighbors
+import os
 import os.path
 import pickle
 import face_recognition
 from face_recognition.face_recognition_cli import image_files_in_folder
 import math
 
-def start():
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def start(train_dir=None, model_save_path=None):
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'JPG'}
 
-    train_dir = "D:/Users/User/GitHub/allrussianhackaton/media"
-    model_save_path = "trained_model.clf"
+    train_dir = train_dir or os.environ.get(
+        'FACE_TRAIN_DIR', os.path.join(BASE_DIR, 'media')
+    )
+    model_save_path = model_save_path or os.path.join(BASE_DIR, 'trained_model.clf')
     n_neighbors = 2
     knn_algo = 'ball_tree'
     verbose = True
@@ -52,6 +58,11 @@ def start():
                 y.append(class_dir)
     print("[#] Reading all directories.")
 
+    if not X:
+        raise SystemExit(
+            "No face images found in {}. Expected one subfolder per person.".format(train_dir)
+        )
+
     knn_clf = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors, algorithm=knn_algo, weights='distance')
     knn_clf.fit(X, y)
 
@@ -62,4 +73,6 @@ def start():
 
     print("[@] Model save.")
 
-start()
+
+if __name__ == '__main__':
+    start()
