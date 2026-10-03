@@ -35,6 +35,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'axes.middleware.AxesMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    # Serves static_files/ in the container, where no web server runs in front
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -55,7 +57,6 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'templates'),
-            os.path.join(BASE_DIR, 'frontend'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -153,8 +154,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
-    # Vite build output for the React dashboard (assets referenced as /static/assets/...)
-    os.path.join(BASE_DIR, 'frontend', 'dist'),
 ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -3,7 +3,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
-from django.views.generic import TemplateView
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
@@ -32,7 +31,7 @@ urlpatterns = [
     path('database/', include('apps.data.urls')),
     path('dashboard/', include('apps.camerastream.urls')),
 
-    # REST API consumed by the React dashboard in /frontend
+    # REST API consumed by the dashboard and by external clients
     path('api/', include(api_router.urls)),
     path('api/summary/', DashboardSummaryView.as_view(), name='api-summary'),
     path('api/auth/token/', TokenObtainPairView.as_view(), name='token-obtain'),
@@ -43,9 +42,6 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name='schema'),
         name='api-docs',
     ),
-
-    # React dashboard: `npm run build` in frontend/ writes frontend/dist/index.html
-    path('app/', TemplateView.as_view(template_name='frontend/dist/index.html'), name='spa'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

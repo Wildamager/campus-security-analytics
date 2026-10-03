@@ -1,0 +1,16 @@
+.git
+.gitignore
+.venv
+venv
+env
+__pycache__
+*.py[cod]
+db.sqlite3
+test_db.sqlite3
+/media
+/static_files
+*.log
+.env
+docs
+README.md
+LICENSE

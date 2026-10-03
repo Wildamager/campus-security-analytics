@@ -37,7 +37,7 @@ Built for the All-Russian Hackathon (2022) and reworked afterwards.
 | CV / ML | OpenCV · dlib · face_recognition · scikit-learn · TensorFlow/Keras |
 | Data | PostgreSQL (falls back to SQLite) · Redis (broker + result backend) |
 | Frontend | Django templates · Bootstrap 5 · jQuery · Chart.js |
-| Infra | Docker (Redis service) · Gunicorn-ready · Linux |
+| Infra | Docker Compose (PostgreSQL, Redis, app, workers) · Gunicorn · WhiteNoise |
 
 ## Getting started
 
@@ -46,7 +46,7 @@ Built for the All-Russian Hackathon (2022) and reworked afterwards.
 ```bash
 git clone https://github.com/Wildamager/campus-security-analytics.git
 cd campus-security-analytics
-python -m venv venv
+python -m venv venv                 # Python 3.10, the versions in requirements.txt target it
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
@@ -73,6 +73,17 @@ Redis is needed for Celery:
 ```bash
 docker compose up -d redis
 ```
+
+The whole stack can run in containers as well — PostgreSQL, Redis, the Django
+app under Gunicorn and both Celery workers:
+
+```bash
+docker compose up -d --build
+```
+
+`POSTGRES_PASSWORD` must be set in `.env` before that, the image compiles
+`dlib` and `face_recognition` on the first build, and the dashboard is then on
+http://127.0.0.1:8000/.
 
 ### 4. Database and superuser
 
@@ -107,7 +118,7 @@ Open http://127.0.0.1:8000/ and sign in.
 | `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_HOST` / `POSTGRES_PORT` | — | PostgreSQL connection; empty `POSTGRES_DB` → SQLite |
 | `AXES_FAILURE_LIMIT` | `4` | login attempts before lockout |
 | `AXES_COOLOFF_TIME` | `2` | lockout duration, hours |
-| `CORS_ORIGIN_WHITELIST` | `127.0.0.1:3000` | allowed frontend origins |
+| `CORS_ORIGIN_WHITELIST` | — | origins allowed by CORS, only needed for a separate frontend |
 
 ## REST API
 
@@ -161,7 +172,8 @@ read-only logs and the summary endpoint. Regenerate the OpenAPI schema with
 ├── backend/              # settings, urls, celery app
 ├── static/               # admin assets, dashboard css/js
 ├── templates/            # dashboard, database, auth pages
-├── docker-compose.yml    # Redis service
+├── Dockerfile            # app image: Python 3.10, ML deps, Gunicorn
+├── docker-compose.yml    # PostgreSQL, Redis, app, Celery worker and beat
 ├── manage.py
 └── requirements.txt
 ```
@@ -185,10 +197,10 @@ read-only logs and the summary endpoint. Regenerate the OpenAPI schema with
 - [x] Camera management + live MJPEG stream
 - [x] Face recognition and plate recognition
 - [x] Celery workers for recognition and training
-- [x] PostgreSQL support and Docker for Redis
+- [x] PostgreSQL support and a Docker Compose stack
 - [x] REST API with JWT authentication and OpenAPI docs
 - [x] API test suite
-- [ ] React dashboard consuming the API
+- [ ] Separate frontend (React) consuming the API
 - [ ] CI on push
 
 ## License
