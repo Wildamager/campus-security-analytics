@@ -21,8 +21,11 @@ Built for the All-Russian Hackathon (2022) and reworked afterwards.
 - **Access decisions** — person + plate are matched against the database, the barrier/door
   command is returned only when both are known
 - **Person and car database** — CRUD, photo upload per person, Django admin
+- **REST API** — Django REST Framework with JWT auth for persons, cars, cameras and event logs
+- **API documentation** — OpenAPI schema and Swagger UI at `/api/docs/`
 - **Event log** — every entry is written to `EntryPersonLog` / `EntryCarLog`
 - **Async processing** — recognition and model training run as Celery tasks
+- **Tested** — API test suite covering auth, permissions, pagination and normalisation
 - **Hardened admin** — `django-axes` brute-force protection, honeypot admin panel
   (`/admin/` is a trap, the real one is at `/secret/`)
 
@@ -30,7 +33,7 @@ Built for the All-Russian Hackathon (2022) and reworked afterwards.
 
 | Layer | Technology |
 |---|---|
-| Backend | Python 3 · Django 3.2 · Celery 5 · Django REST-style views |
+| Backend | Python 3 · Django 3.2 · Django REST Framework 3.14 · SimpleJWT · drf-spectacular |
 | CV / ML | OpenCV · dlib · face_recognition · scikit-learn · TensorFlow/Keras |
 | Data | PostgreSQL (falls back to SQLite) · Redis (broker + result backend) |
 | Frontend | Django templates · Bootstrap 5 · jQuery · Chart.js |
@@ -106,13 +109,55 @@ Open http://127.0.0.1:8000/ and sign in.
 | `AXES_COOLOFF_TIME` | `2` | lockout duration, hours |
 | `CORS_ORIGIN_WHITELIST` | `127.0.0.1:3000` | allowed frontend origins |
 
+## REST API
+
+All endpoints live under `/api/` and require an authenticated user. Get a token
+pair with your Django credentials:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/auth/token/ \
+     -H 'Content-Type: application/json' \
+     -d '{"username": "admin", "password": "your-password"}'
+```
+
+```bash
+curl http://127.0.0.1:8000/api/persons/ -H 'Authorization: Bearer <access>'
+```
+
+| Endpoint | Methods | Notes |
+|---|---|---|
+| `/api/auth/token/` | POST | JWT pair (`access`, `refresh`) |
+| `/api/auth/token/refresh/` | POST | new access token from a refresh token |
+| `/api/persons/` | GET, POST, PATCH, DELETE | `?search=` over name, email, contact; email is lowercased, photo optional |
+| `/api/cars/` | GET, POST, PATCH, DELETE | `?search=` over owner, plate, brand; plate is uppercased without spaces |
+| `/api/cameras/` | GET, POST, PATCH, DELETE | `login` and `password` are write-only and never returned |
+| `/api/logs/persons/`, `/api/logs/cars/` | GET | read-only event log, newest first |
+| `/api/summary/` | GET | counters for the dashboard header |
+| `/api/docs/` | GET | Swagger UI |
+| `/api/schema/` | GET | raw OpenAPI schema |
+
+Lists are paginated (25 per page) with `?page=` and `?page_size=`.
+
+## Tests
+
+The API test suite runs on SQLite, so no database or Redis is needed:
+
+```bash
+python manage.py test apps.data
+```
+
+It covers token issuing, anonymous access rejection, bearer authorisation,
+pagination, search, field normalisation, write-only camera credentials,
+read-only logs and the summary endpoint. Regenerate the OpenAPI schema with
+`python manage.py spectacular --file schema.yml`.
+
 ## Project structure
 
 ```text
 .
 ├── apps/
 │   ├── camerastream/     # cameras, live stream, recognition tasks, CV models
-│   └── data/             # persons and cars database, CRUD, forms
+│   └── data/             # persons and cars database, CRUD, forms, REST API
 ├── backend/              # settings, urls, celery app
 ├── static/               # admin assets, dashboard css/js
 ├── templates/            # dashboard, database, auth pages
@@ -123,12 +168,17 @@ Open http://127.0.0.1:8000/ and sign in.
 
 ## Notes and limitations
 
-- The face model (`trained_model.clf`) and the landmark predictor (`.dat`, ~100 MB)
-  are not kept in the repository — the training task regenerates them.
+- The face model (`*.clf`) and the 95 MB landmark predictor (`*.dat`) are
+  git-ignored and no longer tracked. After cloning, put the predictor in
+  `apps/camerastream/shape_predictor_68_face_landmarks.dat` (it also ships with
+  the `face_recognition_models` package) and run the training task to
+  regenerate the classifier.
 - CV dependencies (`dlib`, `face_recognition`, TensorFlow) need CMake and a C++
   toolchain on Linux; on Windows use prebuilt wheels.
 - RTSP stream URLs in `apps/camerastream/camera.py` are device-specific and are
   meant to be configured per camera in the dashboard.
+- Plate recognition uses the Russian Haar cascade
+  (`haarcascade_russian_plate_number.xml`); other locales need another XML.
 
 ## Roadmap
 
@@ -136,9 +186,10 @@ Open http://127.0.0.1:8000/ and sign in.
 - [x] Face recognition and plate recognition
 - [x] Celery workers for recognition and training
 - [x] PostgreSQL support and Docker for Redis
-- [ ] REST API with token authentication
+- [x] REST API with JWT authentication and OpenAPI docs
+- [x] API test suite
 - [ ] React dashboard consuming the API
-- [ ] Tests and CI on push
+- [ ] CI on push
 
 ## License
 
@@ -151,5 +202,7 @@ Open http://127.0.0.1:8000/ and sign in.
 Веб-приложение на Django для аналитики с камер видеонаблюдения: живой видеопоток
 с IP-камер, распознавание лиц и автомобильных номеров, сверка с базой людей и
 машин, выдача команды на открытие барьера. Распознавание вынесено в Celery-задачи,
-интерфейс — Django-шаблоны и Bootstrap. Поддерживаются PostgreSQL и Redis,
-есть защита админки (django-axes, honeypot). Лицензия MIT.
+интерфейс — Django-шаблоны и Bootstrap. Есть REST API на Django REST Framework
+с JWT-авторизацией и Swagger по адресу `/api/docs/`, покрытый тестами.
+Поддерживаются PostgreSQL и Redis, есть защита админки (django-axes, honeypot).
+Лицензия MIT.

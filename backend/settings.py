@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 from decouple import config
 
@@ -20,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'apps.camerastream',
     'apps.data',
     'admin_honeypot',
@@ -27,6 +29,7 @@ INSTALLED_APPS = [
     'jazzmin',
     "django_celery_beat",
     "django_celery_results",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -52,6 +55,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'frontend'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -64,6 +68,32 @@ TEMPLATES = [
         },
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 25,
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Camera Analytics API',
+    'DESCRIPTION': 'People, cars and cameras for the video surveillance analytics dashboard.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 CELERY_BROKER_URL = config("CELERY_BROKER_REDIS_URL", default="redis://localhost:6379")
 
@@ -122,11 +152,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
 STATICFILES_DIRS = [
-os.path.join(BASE_DIR, 'static')
+    os.path.join(BASE_DIR, 'static'),
+    # Vite build output for the React dashboard (assets referenced as /static/assets/...)
+    os.path.join(BASE_DIR, 'frontend', 'dist'),
 ]
 
-MEDIA_ROOT=os.path.join(BASE_DIR,'media')
-MEDIA_URL='/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
