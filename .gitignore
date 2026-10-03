@@ -1,8 +1,55 @@
-*.pyc
-/venv/
-*.json
-*.sqlite3
-*.png
-*.ipg
-*.webp
-*.JPG
+# --- Secrets (never commit) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+env/
+ENV/
+
+# --- Django ---
+*.log
+db.sqlite3
+db.sqlite3-journal
+/media/
+/static_files/
+local_settings.py
+
+# --- ML artefacts (large binaries, regenerate with `manage.py` training tasks) ---
+*.dat
+*.caffemodel
+*.caffemodel.bin
+weights/
+*.h5
+*.tflite
+Unknown.png
+
+# --- Keep lockfiles and data manifests ---
+!package.json
+!package-lock.json
+!requirements.txt
+!*.json.example
+
+# --- Editors / OS ---
+.idea/
+.vscode/
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
+# --- Tests / coverage ---
+.coverage
+htmlcov/
+.pytest_cache/

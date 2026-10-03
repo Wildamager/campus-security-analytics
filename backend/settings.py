@@ -3,11 +3,10 @@ from pathlib import Path
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-print(BASE_DIR)
 
 SECRET_KEY = config("SECRET_KEY")
 
-DEBUG = config("DEBUG", default=1)
+DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1").split(" ")
 
@@ -76,12 +75,24 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if config("POSTGRES_DB", default=None):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config("POSTGRES_DB"),
+            'USER': config("POSTGRES_USER"),
+            'PASSWORD': config("POSTGRES_PASSWORD", default=""),
+            'HOST': config("POSTGRES_HOST", default="127.0.0.1"),
+            'PORT': config("POSTGRES_PORT", default="5432"),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -110,7 +121,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
-print(STATIC_ROOT)
 STATICFILES_DIRS = [
 os.path.join(BASE_DIR, 'static')
 ]
